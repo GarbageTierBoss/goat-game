@@ -242,7 +242,7 @@ public class PlayerController : MonoBehaviour
 
             if (transform.localScale.x != xInput.x)
             {
-                transform.localScale = new Vector2(xInput.x, 1);
+                transform.localScale = new Vector3(xInput.x, 1, 1);
                 Debug.Log("turn");
             }
 
@@ -316,7 +316,7 @@ public class PlayerController : MonoBehaviour
     {
         falling = false;
         onGround = true;
-        Debug.Log("" + transform.position.y + collision.GetComponent<BoxCollider2D>().bounds.extents.y);
+        //Debug.Log("" + transform.position.y + collision.GetComponent<BoxCollider2D>().bounds.extents.y);
     }
 
     /*void CheckMove()
