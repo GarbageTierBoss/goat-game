@@ -285,11 +285,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d36dae447706c534e914bf86289a0e6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _triggerKey: 0
-  _maxRamSpeed: 0
-  _accelerationTime: 0
+  _triggerKey: 32
+  _maxRamSpeed: 4
+  _accelerationTime: 0.16666667
   _decelerationTimeIfNoImpact: 0
   _recoilTimeIfHitObstacle: 0
+  _durationOfDash: 0.25
 --- !u!1 &1145441935
 GameObject:
   m_ObjectHideFlags: 0
