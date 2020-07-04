@@ -13,10 +13,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_terminalVelocity;
 
-    [SerializeField]
+    //[SerializeField]
     private float m_coyoteTime;
 
-    [SerializeField]
+    //[SerializeField]
     private float m_jumpBufferTime;
 
     [SerializeField]

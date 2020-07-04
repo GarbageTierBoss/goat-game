@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -153,16 +154,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68786afc8279eb042a6972fc63d77a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_jumpApexHeight: 3
-  m_jumpApexTime: 0
-  m_terminalVelocity: 0
-  m_coyoteTime: 0
-  m_jumpBufferTime: 0
-  m_accelerationTimeFromRest: 0
-  m_decelerationTimeToRest: 0
-  m_maxHorizontalSpeed: 0
-  m_accelerationTimeFromQuickturn: 0
-  m_decelerationTimeFromQuickturn: 0
+  m_jumpApexHeight: 4.295
+  m_jumpApexTime: 0.16666667
+  m_terminalVelocity: 27.6
+  m_accelerationTimeFromRest: 0.2
+  m_decelerationTimeToRest: 0.16666667
+  m_maxHorizontalSpeed: 5.85
 --- !u!61 &553437633
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -203,6 +200,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -432,6 +430,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
