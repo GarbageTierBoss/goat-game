@@ -146,6 +146,16 @@ public class PlayerController : MonoBehaviour
     {
         Collider2D hit = Physics2D.OverlapBox(rb.position - (GetComponent<BoxCollider2D>().size / 2) + (GetComponent<BoxCollider2D>().size / 20), GetComponent<BoxCollider2D>().size / 10, 0, LayerMask.GetMask("Ground"));
 
+        if (Input.GetButton("Jump"))
+        {
+            Debug.Log("Jump down hold.");
+        }
+        
+        if (Input.GetButtonDown("Jump"))
+        {
+            Debug.Log("Jump frame press");
+        }
+
         if (hit)
         {
             onGround = true;
