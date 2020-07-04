@@ -28,10 +28,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float m_maxHorizontalSpeed;
 
-    [SerializeField]
+    //[SerializeField]
     private float m_accelerationTimeFromQuickturn;
 
-    [SerializeField]
+    //[SerializeField]
     private float m_decelerationTimeFromQuickturn;
 
     public enum FacingDirection { Left, Right }
@@ -122,7 +122,8 @@ public class PlayerController : MonoBehaviour
         buffered = false;
 
         m_timeElapsed = 0;          //in seconds
-        m_terminalTime = 1f / 4f;   //in seconds
+
+        /*m_terminalTime = 1f / 4f;   //in seconds
         m_initJumpTime = 1f / 60f;  //in seconds
         m_postJumpTime = 1f / 5f;   //in seconds
 
@@ -138,7 +139,7 @@ public class PlayerController : MonoBehaviour
         m_accelerationTimeFromQuickturn = 1f / 30f; //in seconds
         m_decelerationTimeFromQuickturn = 2f / 15f; //in seconds
         m_terminalVelocity = 27.6f;                 //in tiles per second
-        m_maxHorizontalSpeed = 5.85f;               //in tiles per second
+        m_maxHorizontalSpeed = 5.85f;               //in tiles per second*/
     }
 
     private void Update()
