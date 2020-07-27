@@ -105,6 +105,7 @@ public class PlayerController : MonoBehaviour
     const float midJump = 17.1f;
 
     GameObject ground;
+    Collider2D hit;
 
     private void Awake()
     {
@@ -144,7 +145,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        Collider2D hit = Physics2D.OverlapBox(rb.position - (GetComponent<BoxCollider2D>().size / 2) + (GetComponent<BoxCollider2D>().size / 20), GetComponent<BoxCollider2D>().size / 10, 0, LayerMask.GetMask("Ground"));
+        hit = Physics2D.OverlapBox(rb.position - (GetComponent<BoxCollider2D>().size / 2) + (GetComponent<BoxCollider2D>().size / 20), GetComponent<BoxCollider2D>().size / 10, 0, LayerMask.GetMask("Ground"));
 
         if (Input.GetButton("Jump"))
         {
@@ -156,14 +157,12 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Jump frame press");
         }
 
-        if (hit)
-        {
-            onGround = true;
-        }
+        
     }
 
     private void FixedUpdate()
     {
+        
         Gravity();
         CheckJump();
         //CheckQuickTurn();
@@ -352,6 +351,11 @@ public class PlayerController : MonoBehaviour
 
     void CheckJump()
     {
+        if (hit)
+        {
+            onGround = true;
+        }
+
         if (Input.GetButton("Jump") && Input.GetButtonDown("Jump")
             && onGround && !jumping)
         {
