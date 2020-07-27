@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    bool isInitialJump = false;
+    bool isMidJump = false;
+    bool isApexJump = false;
+    
     [SerializeField]
     private float m_jumpApexHeight;
 
@@ -156,15 +160,16 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("Jump frame press");
         }
-
         
+        CheckJump();
+
     }
 
     private void FixedUpdate()
     {
         
         Gravity();
-        CheckJump();
+        Jumpsim();
         //CheckQuickTurn();
 
         if (!quickTurn)
@@ -348,18 +353,35 @@ public class PlayerController : MonoBehaviour
             rb.position += ShovelKnightInput.GetDirectionalInput() * m_maxHorizontalSpeed * Time.fixedDeltaTime;
         }
     }*/
+    void Jumpsim()
+    { 
+        if (isInitialJump) { jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, initJump, 0, initJump); } 
+        else if (isMidJump)
+        {
+            jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, midJump, 0, midJump);
+        } 
+        else if (isApexJump)
+        {
+            jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, -1, 0, midJump);
+        }
+    }
 
     void CheckJump()
     {
         if (hit)
         {
             onGround = true;
+            isInitialJump = false;
+            isMidJump = false;
+            isApexJump = false;
         }
 
         if (Input.GetButton("Jump") && Input.GetButtonDown("Jump")
             && onGround && !jumping)
         {
-            jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, initJump, 0, initJump);
+            isInitialJump = true;
+            isMidJump = false;
+            isApexJump = false;
             m_timeElapsed = 0;
             jumping = true;
             onGround = false;
@@ -367,11 +389,15 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetButton("Jump") && !Input.GetButtonDown("Jump")
             && jumping && m_timeElapsed <= m_jumpApexTime)
         {
-            jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, midJump, 0, midJump);
+            isInitialJump = false;
+            isMidJump = true;
+            isApexJump = false;
         }
         else if (((!Input.GetButtonDown("Jump") && !Input.GetButton("Jump")) || m_timeElapsed > m_jumpApexTime))
         {
-            jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, -1, 0, midJump);
+            isInitialJump = false;
+            isMidJump = false;
+            isApexJump = true;
             jumping = false;
         }
     }
