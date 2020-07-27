@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class RamDash : MonoBehaviour //Inherit from action (IS-A)
 {
@@ -15,6 +13,7 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
     private float _timeElapsed;
 
     private Vector2 _initialLocation;
+    private Vector2 _finalLocation;
     private Vector2 _crashLocation;
     private Rigidbody2D _rb;
 
@@ -35,8 +34,8 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
 
         if (_ramCommand)
         {
-            _rb.position = Vector2.MoveTowards(_rb.position, DashDestination(), _maxRamSpeed);
-            if (_rb.position == DashDestination())
+            _rb.position = Vector2.MoveTowards(_rb.position, _finalLocation, _maxRamSpeed);
+            if (_rb.position == _finalLocation)
             {
                 _ramCommand = false;
                 TurnOnPlayerController();
@@ -49,6 +48,7 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
         if (Input.GetKeyDown(_triggerKey))   //space recommended
         {
             _ramCommand = true;
+            _finalLocation = _rb.position + DashVectorFromOrigin();
 
             TurnOffPlayerController();
 
@@ -69,15 +69,14 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
         return FindMousePositionInWorldPoint() - _rb.position;
     }
 
-    private Vector2 DashDestination()
+    private Vector2 DashVectorFromOrigin()
     {
-        Vector2 direction = FindMousePositionInWorldPoint().normalized;
+        Vector2 direction = VectorFromGoatToMouse().normalized;
         return direction * _dashDistance;
     }
 
     public void OnMouseUp()
     {
-        Debug.Log(DashDestination());
         _ramCommand = true;
     }
 
