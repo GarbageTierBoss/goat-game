@@ -28,10 +28,13 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         CheckTriggerKey();
+    }
 
+    private void FixedUpdate()
+    {
         if (_ramCommand)
         {
             _rb.position = Vector2.MoveTowards(_rb.position, _finalLocation, _maxRamSpeed);
@@ -40,8 +43,10 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
                 _ramCommand = false;
                 TurnOnPlayerController();
             }
-        }
+        
     }
+}
+
 
     private void CheckTriggerKey()
     {
