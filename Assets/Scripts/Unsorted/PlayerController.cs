@@ -52,6 +52,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void StopWalking()
+    {
+        walkSpeed = 0;
+    }
+
     public bool IsGrounded()
     {
         //RaycastHit2D hit = Physics2D.BoxCast(rb.transform.position + new Vector3(0, 0.1f, 0), new Vector2(0.8f, 0.2f), 0, Vector2.down, 0.05f, LayerMask.GetMask("Ground"));
@@ -169,7 +174,7 @@ public class PlayerController : MonoBehaviour
     {
         
         Gravity();
-        Jumpsim();
+        JumpSim();
         //CheckQuickTurn();
 
         if (!quickTurn)
@@ -317,7 +322,8 @@ public class PlayerController : MonoBehaviour
             //TODO: WHILE FALLING
             if (falling)
             {
-                rb.position = new Vector2(rb.position.x, (ground.transform.position.y + ground.GetComponent<BoxCollider2D>().bounds.extents.y + GetComponent<BoxCollider2D>().size.y / 2)- 0.001f);
+                //IMPORTANT
+                /*rb.position = new Vector2(rb.position.x, (ground.transform.position.y + ground.GetComponent<BoxCollider2D>().bounds.extents.y + GetComponent<BoxCollider2D>().size.y / 2)- 0.001f);*/
                 
                 falling = false;
                 //end while
@@ -327,12 +333,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    /*private void OnTriggerEnter2D(Collider2D collision)
     {
         falling = false;
         onGround = true;
         //Debug.Log("" + transform.position.y + collision.GetComponent<BoxCollider2D>().bounds.extents.y);
-    }
+    }*/
 
     /*void CheckMove()
     {
@@ -353,7 +359,7 @@ public class PlayerController : MonoBehaviour
             rb.position += ShovelKnightInput.GetDirectionalInput() * m_maxHorizontalSpeed * Time.fixedDeltaTime;
         }
     }*/
-    void Jumpsim()
+    void JumpSim()
     { 
         if (isInitialJump) { jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, initJump, 0, initJump); } 
         else if (isMidJump)
@@ -395,11 +401,16 @@ public class PlayerController : MonoBehaviour
         }
         else if (((!Input.GetButtonDown("Jump") && !Input.GetButton("Jump")) || m_timeElapsed > m_jumpApexTime))
         {
-            isInitialJump = false;
-            isMidJump = false;
-            isApexJump = true;
-            jumping = false;
+            StopJump();
         }
+    }
+
+    public void StopJump()
+    {
+        isInitialJump = false;
+        isMidJump = false;
+        isApexJump = true;
+        jumping = false;
     }
 
     float AccelerateWithVelocity(Vector2 input, float velocity, float accel, float min, float max)

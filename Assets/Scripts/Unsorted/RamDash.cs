@@ -40,20 +40,28 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
             _rb.position = Vector2.MoveTowards(_rb.position, _finalLocation, _maxRamSpeed);
             if (_rb.position == _finalLocation)
             {
-                _ramCommand = false;
-                TurnOnPlayerController();
+                StopRam();
             }
-        
+        }
     }
-}
 
+    public void StopRam()
+    {
+        _ramCommand = false;
+        TurnOnPlayerController();
+    }
+
+    public bool IsRamming()
+    {
+        return _ramCommand;
+    }
 
     private void CheckTriggerKey()
     {
         if (Input.GetKeyDown(_triggerKey))   //space recommended
         {
             _ramCommand = true;
-            _finalLocation = _rb.position + DashVectorFromOrigin();
+            _finalLocation = CalculateFinalLocation();
 
             TurnOffPlayerController();
 
@@ -61,6 +69,22 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
             _initialLocation = _rb.position;
 
             StartCoroutine(AccelerateDash());*/
+        }
+    }
+
+    private Vector2 CalculateFinalLocation()
+    {
+        Vector2 finalLocationIfNotInterrupted = _rb.position + DashVectorFromOrigin();
+        RaycastHit2D hit = Physics2D.Linecast(_rb.position, finalLocationIfNotInterrupted, LayerMask.GetMask("Ground"));
+
+        if (hit)    //hit platform or wall
+        {
+            //new location final
+            return (_rb.position - (_rb.GetComponent<BoxCollider2D>().size/2) )+ (VectorFromGoatToPoint(hit.point).normalized * hit.distance);
+        }
+        else
+        {
+            return finalLocationIfNotInterrupted;
         }
     }
 
@@ -72,6 +96,11 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
     private Vector2 VectorFromGoatToMouse()
     {
         return FindMousePositionInWorldPoint() - _rb.position;
+    }
+
+    private Vector2 VectorFromGoatToPoint(Vector2 worldPoint)
+    {
+        return worldPoint - _rb.position;
     }
 
     private Vector2 DashVectorFromOrigin()
