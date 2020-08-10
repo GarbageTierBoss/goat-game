@@ -4,85 +4,18 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    bool isInitialJump = false;
-    bool isMidJump = false;
-    bool isApexJump = false;
-    
-    [SerializeField]
-    private float m_jumpApexHeight;
-
-    [SerializeField]
-    private float m_jumpApexTime;
-
-    [SerializeField]
-    private float m_terminalVelocity;
-
-    //[SerializeField]
-    private float m_coyoteTime;
-
-    //[SerializeField]
-    private float m_jumpBufferTime;
-
-    [SerializeField]
-    private float m_accelerationTimeFromRest;
-
-    [SerializeField]
-    private float m_decelerationTimeToRest;
-
-    [SerializeField]
-    private float m_maxHorizontalSpeed;
-
-    //[SerializeField]
-    private float m_accelerationTimeFromQuickturn;
-
-    //[SerializeField]
-    private float m_decelerationTimeFromQuickturn;
-
     public enum FacingDirection { Left, Right }
 
-    public bool IsWalking()
-    {
-        if (walkSpeed != 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public void StopWalking()
-    {
-        walkSpeed = 0;
-    }
-
-    public bool IsGrounded()
-    {
-        //RaycastHit2D hit = Physics2D.BoxCast(rb.transform.position + new Vector3(0, 0.1f, 0), new Vector2(0.8f, 0.2f), 0, Vector2.down, 0.05f, LayerMask.GetMask("Ground"));
-        RaycastHit2D hit = Physics2D.BoxCast(rb.position/* + new Vector2(0, rb.velocity.y)*/, GetComponent<BoxCollider2D>().size, 0, Vector2.down, fallSpeed * Time.fixedDeltaTime, LayerMask.GetMask("Ground"));
-
-        if (hit)
-        {
-            ground = hit.collider.gameObject;
-        }
-
-        return hit;
-    }
-
-    public FacingDirection GetFacingDirection()
-    {
-        if (spriteScale.x > 0)
-        {
-            return FacingDirection.Right;
-        }
-        else
-        {
-            return FacingDirection.Left;
-        }
-    }
-
-    // Add additional methods such as Start, Update, FixedUpdate, or whatever else you think is necessary, below.
+    [SerializeField] private float m_jumpApexHeight;
+    [SerializeField] private float m_jumpApexTime;
+    [SerializeField] private float m_terminalVelocity;
+    /*[SerializeField]*/ private float m_coyoteTime;
+    /*[SerializeField]*/ private float m_jumpBufferTime;
+    [SerializeField] private float m_accelerationTimeFromRest;
+    [SerializeField] private float m_decelerationTimeToRest;
+    [SerializeField] private float m_maxHorizontalSpeed;
+    /*[SerializeField]*/ private float m_accelerationTimeFromQuickturn;
+    /*[SerializeField]*/ private float m_decelerationTimeFromQuickturn;
 
     Rigidbody2D rb;         //rigidbody component
     Vector2 prevInput;      //tracking previous horizontal input
@@ -113,8 +46,53 @@ public class PlayerController : MonoBehaviour
     const float initJump = 21.3f;
     const float midJump = 17.1f;
 
+    bool isInitialJump = false;
+    bool isMidJump = false;
+    bool isApexJump = false;
+
     GameObject ground;
     Collider2D hit;
+
+    public bool IsWalking()
+    {
+        if (walkSpeed != 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void StopWalking()
+    {
+        walkSpeed = 0;
+    }
+
+    public bool IsGrounded()
+    {
+        RaycastHit2D hit = Physics2D.BoxCast(rb.position/* + new Vector2(0, rb.velocity.y)*/, GetComponent<BoxCollider2D>().size, 0, Vector2.down, fallSpeed * Time.fixedDeltaTime, LayerMask.GetMask("Ground"));
+
+        if (hit)
+        {
+            ground = hit.collider.gameObject;
+        }
+
+        return hit;
+    }
+
+    public FacingDirection GetFacingDirection()
+    {
+        if (spriteScale.x > 0)
+        {
+            return FacingDirection.Right;
+        }
+        else
+        {
+            return FacingDirection.Left;
+        }
+    }
 
     private void Awake()
     {
@@ -132,6 +110,8 @@ public class PlayerController : MonoBehaviour
         buffered = false;
 
         m_timeElapsed = 0;          //in seconds
+
+        //ORIGINAL VALUES
 
         /*m_terminalTime = 1f / 4f;   //in seconds
         m_initJumpTime = 1f / 60f;  //in seconds
@@ -155,27 +135,14 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         hit = Physics2D.OverlapBox(rb.position - (GetComponent<BoxCollider2D>().size / 2) + (GetComponent<BoxCollider2D>().size / 20), GetComponent<BoxCollider2D>().size / 10, 0, LayerMask.GetMask("Ground"));
-
-        if (Input.GetButton("Jump"))
-        {
-            Debug.Log("Jump down hold.");
-        }
-        
-        if (Input.GetButtonDown("Jump"))
-        {
-            Debug.Log("Jump frame press");
-        }
         
         CheckJump();
-
     }
 
     private void FixedUpdate()
     {
-        
         Gravity();
         JumpSim();
-        //CheckQuickTurn();
 
         if (!quickTurn)
         {
@@ -185,62 +152,6 @@ public class PlayerController : MonoBehaviour
         m_timeElapsed += Time.fixedDeltaTime;
         m_bufferElapsed += Time.fixedDeltaTime;
         m_coyoteElapsed += Time.fixedDeltaTime;
-
-        //Debug.Log(walkSpeed);
-        //Debug.Log(ShovelKnightInput.IsJumpPressed() + " " + ShovelKnightInput.WasJumpPressed());
-    }
-
-    #region new
-    /*void Gravity()
-    {
-        if (!IsGrounded() && !jumping)
-        {
-            m_timeElapsed = 0;
-            fallSpeed = Accelerate(Vector2.down, m_terminalTime, 0, m_terminalVelocity, fallSpeed);
-        }
-        else
-        {
-            fallSpeed = 0;
-        }
-
-        //Debug.Log(IsGrounded());
-    }*/
-
-    void CheckQuickTurn()
-    {
-        Vector2 temp = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
-        //if quickturn is in effect or if the conditions are met for quick turn, adjust new acceleration values
-        if ((prevInput.x != temp.x && walkSpeed != 0 //previous input must not be the same as current input
-            && temp.x != 0) || quickTurn)    //walk speed must not be 0, and horizontal input must not be 0
-        {
-            quickTurn = true;
-            Vector2 xInput = new Vector2(temp.x, 0); //ignores y-axis input
-
-            if (walkSpeed == 0)
-            {
-                turned = true;
-            }
-
-            if (turned && IsGrounded())
-            {
-                walkSpeed = AccelerateWithTime(xInput, m_accelerationTimeFromQuickturn, 0, m_maxHorizontalSpeed, walkSpeed);
-            }
-            else if (IsGrounded())
-            {
-                walkSpeed = AccelerateWithTime(xInput, m_decelerationTimeFromQuickturn, m_maxHorizontalSpeed, 0, walkSpeed);
-            }
-            else
-            {
-                rb.position += xInput * m_maxHorizontalSpeed * Time.fixedDeltaTime;
-            }
-        }
-
-        if ((walkSpeed == 0 && temp.x == 0) || walkSpeed == m_maxHorizontalSpeed)
-        {
-            quickTurn = false;
-            turned = false;
-        }
     }
 
     void CheckMove()
@@ -275,28 +186,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    /*void CheckJump()
-    {
-        if (ShovelKnightInput.WasJumpPressed() && ShovelKnightInput.IsJumpPressed() && IsGrounded() && !jumping)
-        {
-            jumpSpeed = Accelerate(Vector2.up, m_initJumpTime, 0, initJump, jumpSpeed);
-            m_timeElapsed = 0;
-            jumping = true;
-
-            Debug.Log("Init.");
-        }
-        else if (!ShovelKnightInput.WasJumpPressed() && ShovelKnightInput.IsJumpPressed() && jumping && m_timeElapsed < m_jumpApexTime)
-        {
-            jumpSpeed = Accelerate(Vector2.up, m_jumpApexTime, initJump, midJump, jumpSpeed);
-            m_holdElapsed = 0;
-        }
-        else if (((!ShovelKnightInput.WasJumpPressed() && !ShovelKnightInput.IsJumpPressed()) || m_timeElapsed > m_jumpApexTime))
-        {
-            jumpSpeed = Accelerate(Vector2.up, m_postJumpTime, midJump, 0, jumpSpeed);
-            jumping = false;
-        }
-    }*/
-
     float AccelerateWithTime(Vector2 direction, float duration, float init, float final, float current)
     {
         float max = final > init ? final : current;
@@ -307,9 +196,7 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(current);
         return current;
     }
-    #endregion
 
-    #region alt
     void Gravity()
     {
         if (!IsGrounded() && !jumping)
@@ -332,33 +219,7 @@ public class PlayerController : MonoBehaviour
             fallSpeed = 0;
         }
     }
-
-    /*private void OnTriggerEnter2D(Collider2D collision)
-    {
-        falling = false;
-        onGround = true;
-        //Debug.Log("" + transform.position.y + collision.GetComponent<BoxCollider2D>().bounds.extents.y);
-    }*/
-
-    /*void CheckMove()
-    {
-        if (ShovelKnightInput.GetDirectionalInput() != Vector2.zero && ShovelKnightInput.GetDirectionalInput().y == 0)
-        {
-            walkSpeed = Accelerate(ShovelKnightInput.GetDirectionalInput(), walkSpeed, runAccel, 0, m_maxHorizontalSpeed);
-        }
-        else
-        {
-            walkSpeed = Accelerate(ShovelKnightInput.GetDirectionalInput(), walkSpeed, -runAccel, 0, m_maxHorizontalSpeed);
-        }
-    }
-
-    void AirMove()
-    {
-        if (ShovelKnightInput.GetDirectionalInput() != Vector2.zero && ShovelKnightInput.GetDirectionalInput().y == 0)
-        {
-            rb.position += ShovelKnightInput.GetDirectionalInput() * m_maxHorizontalSpeed * Time.fixedDeltaTime;
-        }
-    }*/
+    
     void JumpSim()
     { 
         if (isInitialJump) { jumpSpeed = AccelerateWithVelocity(Vector2.up, jumpSpeed, initJump, 0, initJump); } 
@@ -429,5 +290,98 @@ public class PlayerController : MonoBehaviour
 
         return velocity;
     }
-    #endregion
+    
+    /*void Gravity()
+    {
+        if (!IsGrounded() && !jumping)
+        {
+            m_timeElapsed = 0;
+            fallSpeed = Accelerate(Vector2.down, m_terminalTime, 0, m_terminalVelocity, fallSpeed);
+        }
+        else
+        {
+            fallSpeed = 0;
+        }
+
+        //Debug.Log(IsGrounded());
+    }
+
+    void CheckQuickTurn()
+    {
+        Vector2 temp = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+        //if quickturn is in effect or if the conditions are met for quick turn, adjust new acceleration values
+        if ((prevInput.x != temp.x && walkSpeed != 0 //previous input must not be the same as current input
+            && temp.x != 0) || quickTurn)    //walk speed must not be 0, and horizontal input must not be 0
+        {
+            quickTurn = true;
+            Vector2 xInput = new Vector2(temp.x, 0); //ignores y-axis input
+
+            if (walkSpeed == 0)
+            {
+                turned = true;
+            }
+
+            if (turned && IsGrounded())
+            {
+                walkSpeed = AccelerateWithTime(xInput, m_accelerationTimeFromQuickturn, 0, m_maxHorizontalSpeed, walkSpeed);
+            }
+            else if (IsGrounded())
+            {
+                walkSpeed = AccelerateWithTime(xInput, m_decelerationTimeFromQuickturn, m_maxHorizontalSpeed, 0, walkSpeed);
+            }
+            else
+            {
+                rb.position += xInput * m_maxHorizontalSpeed * Time.fixedDeltaTime;
+            }
+        }
+
+        if ((walkSpeed == 0 && temp.x == 0) || walkSpeed == m_maxHorizontalSpeed)
+        {
+            quickTurn = false;
+            turned = false;
+        }
+    }
+
+    void CheckJump()
+    {
+        if (ShovelKnightInput.WasJumpPressed() && ShovelKnightInput.IsJumpPressed() && IsGrounded() && !jumping)
+        {
+            jumpSpeed = Accelerate(Vector2.up, m_initJumpTime, 0, initJump, jumpSpeed);
+            m_timeElapsed = 0;
+            jumping = true;
+
+            Debug.Log("Init.");
+        }
+        else if (!ShovelKnightInput.WasJumpPressed() && ShovelKnightInput.IsJumpPressed() && jumping && m_timeElapsed < m_jumpApexTime)
+        {
+            jumpSpeed = Accelerate(Vector2.up, m_jumpApexTime, initJump, midJump, jumpSpeed);
+            m_holdElapsed = 0;
+        }
+        else if (((!ShovelKnightInput.WasJumpPressed() && !ShovelKnightInput.IsJumpPressed()) || m_timeElapsed > m_jumpApexTime))
+        {
+            jumpSpeed = Accelerate(Vector2.up, m_postJumpTime, midJump, 0, jumpSpeed);
+            jumping = false;
+        }
+    }
+
+    void CheckMove()
+    {
+        if (ShovelKnightInput.GetDirectionalInput() != Vector2.zero && ShovelKnightInput.GetDirectionalInput().y == 0)
+        {
+            walkSpeed = Accelerate(ShovelKnightInput.GetDirectionalInput(), walkSpeed, runAccel, 0, m_maxHorizontalSpeed);
+        }
+        else
+        {
+            walkSpeed = Accelerate(ShovelKnightInput.GetDirectionalInput(), walkSpeed, -runAccel, 0, m_maxHorizontalSpeed);
+        }
+    }
+
+    void AirMove()
+    {
+        if (ShovelKnightInput.GetDirectionalInput() != Vector2.zero && ShovelKnightInput.GetDirectionalInput().y == 0)
+        {
+            rb.position += ShovelKnightInput.GetDirectionalInput() * m_maxHorizontalSpeed * Time.fixedDeltaTime;
+        }
+    }*/
 }
