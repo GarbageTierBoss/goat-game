@@ -18,19 +18,19 @@ public class CollisionController : MonoBehaviour
             }
         }
 
-        if (GetComponent<PlayerController>())
+        if (GetComponent<StatelessPlayerController>())
         {
             
 
-            GetComponent<PlayerController>().StopJump();
+            GetComponent<StatelessPlayerController>().StopJumping();
         }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (GetComponent<PlayerController>().IsWalking())
+        if (GetComponent<StatelessPlayerController>().IsWalking())
         {
-            GetComponent<PlayerController>().StopWalking();
+            GetComponent<StatelessPlayerController>().StopWalking();
         }
     }
 }

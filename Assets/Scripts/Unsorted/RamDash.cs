@@ -169,9 +169,9 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
 
     private void TurnOffPlayerController()
     {
-        if (GetComponent<PlayerController>())
+        if (GetComponent<StatelessPlayerController>())
         {
-            GetComponent<PlayerController>().enabled = false;
+            GetComponent<StatelessPlayerController>().enabled = false;
         }
         else
         {
@@ -181,6 +181,6 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
 
     private void TurnOnPlayerController()
     {
-        GetComponent<PlayerController>().enabled = true;
+        GetComponent<StatelessPlayerController>().enabled = true;
     }
 }

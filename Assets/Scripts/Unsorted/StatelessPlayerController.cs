@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class StatelessPlayerController : MonoBehaviour
 {
+    #region Variables
+    public enum States { InitialFalling, TerminalFalling, NormalLanding, HardLanding, Idling, Walking, AirWalking, InitialJump, MidJump, ApexJump, WallSliding, WallHopping, Ramming, Wallsliding, Wallhopping }
+
+    public enum Transition { InitialFall, TerminalFall, Land, HardLand, Idle, Walk, AirWalk, Jump, WallSlide, WallHop, Ram, Wallslide, Wallhop}
+
     public enum FacingDirection { Left, Right }
 
     [SerializeField] private float m_jumpApexHeight;
@@ -53,6 +58,9 @@ public class PlayerController : MonoBehaviour
     GameObject ground;
     Collider2D hit;
 
+    States _currentState;
+    #endregion
+
     public bool IsWalking()
     {
         if (walkSpeed != 0)
@@ -65,13 +73,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void StopWalking()
-    {
-        walkSpeed = 0;
-    }
-
     public bool IsGrounded()
     {
+        //This is to make sure the sprite does not cut into the ground in the next frame. The commented code is needed if colliders are triggers. This checks if the ground is hit in the next frame.
         RaycastHit2D hit = Physics2D.BoxCast(rb.position/* + new Vector2(0, rb.velocity.y)*/, GetComponent<BoxCollider2D>().size, 0, Vector2.down, fallSpeed * Time.fixedDeltaTime, LayerMask.GetMask("Ground"));
 
         if (hit)
@@ -80,6 +84,19 @@ public class PlayerController : MonoBehaviour
         }
 
         return hit;
+    }
+
+    public void StopWalking()
+    {
+        walkSpeed = 0;
+    }
+
+    public void StopJumping()
+    {
+        isInitialJump = false;
+        isMidJump = false;
+        isApexJump = true;
+        jumping = false;
     }
 
     public FacingDirection GetFacingDirection()
@@ -111,8 +128,7 @@ public class PlayerController : MonoBehaviour
 
         m_timeElapsed = 0;          //in seconds
 
-        //ORIGINAL VALUES
-
+        #region Original Values
         /*m_terminalTime = 1f / 4f;   //in seconds
         m_initJumpTime = 1f / 60f;  //in seconds
         m_postJumpTime = 1f / 5f;   //in seconds
@@ -130,11 +146,12 @@ public class PlayerController : MonoBehaviour
         m_decelerationTimeFromQuickturn = 2f / 15f; //in seconds
         m_terminalVelocity = 27.6f;                 //in tiles per second
         m_maxHorizontalSpeed = 5.85f;               //in tiles per second*/
+        #endregion
     }
 
     private void Update()
     {
-        hit = Physics2D.OverlapBox(rb.position - (GetComponent<BoxCollider2D>().size / 2) + (GetComponent<BoxCollider2D>().size / 20), GetComponent<BoxCollider2D>().size / 10, 0, LayerMask.GetMask("Ground"));
+        
         
         CheckJump();
     }
@@ -235,6 +252,9 @@ public class PlayerController : MonoBehaviour
 
     void CheckJump()
     {
+        //Checking whether hitting ground on boxcollider/20 bottom
+        hit = Physics2D.OverlapBox(rb.position - (GetComponent<BoxCollider2D>().size / 2) + (GetComponent<BoxCollider2D>().size / 20), GetComponent<BoxCollider2D>().size / 10, 0, LayerMask.GetMask("Ground"));
+
         if (hit)
         {
             onGround = true;
@@ -262,17 +282,10 @@ public class PlayerController : MonoBehaviour
         }
         else if (((!Input.GetButtonDown("Jump") && !Input.GetButton("Jump")) || m_timeElapsed > m_jumpApexTime))
         {
-            StopJump();
+            StopJumping();
         }
     }
 
-    public void StopJump()
-    {
-        isInitialJump = false;
-        isMidJump = false;
-        isApexJump = true;
-        jumping = false;
-    }
 
     float AccelerateWithVelocity(Vector2 input, float velocity, float accel, float min, float max)
     {
