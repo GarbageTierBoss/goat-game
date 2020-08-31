@@ -19,12 +19,15 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
 
     private bool _ramCommand;
 
+    private Animator _component; 
+
     public GameObject cursor;
 
     // Start is called before the first frame update
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _component = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -49,6 +52,8 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
     {
         _ramCommand = false;
         TurnOnPlayerController();
+
+        _component.SetBool("Ram Command", false);
     }
 
     public bool IsRamming()
@@ -64,6 +69,8 @@ public class RamDash : MonoBehaviour //Inherit from action (IS-A)
             _finalLocation = CalculateFinalLocation();
 
             TurnOffPlayerController();
+
+            _component.SetBool("Ram Command", true);
 
             /*_timeElapsed = 0;
             _initialLocation = _rb.position;
